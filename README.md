@@ -71,7 +71,7 @@ GigShield/
 3. Replace in `script.js`:
 
 ```javascript
-const apiKey = "YOUR_API_KEY";
+const apiKey = "000946666df88e700bad2bf38e6d4062";
 ```
 
 ---
@@ -90,11 +90,6 @@ This project can be deployed using GitHub Pages.
 * 🤖 AI-based prediction model
 * 📱 Mobile responsive UI
 
----
-
-## 👩‍💻 Author
-
-Sweety
 
 ---
 
