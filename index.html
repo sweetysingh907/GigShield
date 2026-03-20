@@ -1,29 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>GigShield</title>
-    <link rel="stylesheet" href="style.css">
+  <title>GigShield</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="card">
+  <div class="container">
+
     <h1>🚀 GigShield</h1>
-    <p>AI-powered insurance for gig workers</p>
+    <p>AI-Powered Parametric Insurance for Gig Workers</p>
+    <h3>💡 Check real-time risk based on your location</h3>
 
-    <input type="text" id="city" placeholder="Enter your city" />
-    <br><br>
+    <input type="text" id="city" placeholder="Enter your city">
 
-    <button onclick="checkWeather()">Check Risk</button>
+    <select id="plan">
+      <option value="basic">Basic (₹50/week)</option>
+      <option value="standard">Standard (₹100/week)</option>
+      <option value="premium">Premium (₹150/week)</option>
+    </select>
 
+    <button onclick="checkRisk()">Check Risk</button>
+
+    <p id="loading"></p>
     <p id="result"></p>
+    <p id="fraud"></p>
 
-    <h3>💰 Insurance Plans</h3>
-    <p>Basic: ₹20/week</p>
-    <p>Standard: ₹30/week</p>
-    <p>Premium: ₹40/week</p>
-</div>
+  </div>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
