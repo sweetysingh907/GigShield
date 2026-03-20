@@ -1,6 +1,6 @@
 🚀 GigShield
 AI-Powered Parametric Insurance for Gig Workers
-________________________________________Problem Statement
+Problem Statement
 Gig workers (delivery partners, drivers, freelancers) face income loss due to unpredictable risks such as:
 •	Extreme weather
 •	 Accidents
