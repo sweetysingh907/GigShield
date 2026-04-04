@@ -1084,7 +1084,8 @@
   .catch(() => console.log('Waking up backend...'));
  
 // ===== CONFIG =====
-const API_BASE = 'https://gigshield-backend-zk17.onrender.com';
+const API_BASE = 'https://gigshield-backend-zk17.onrender.com/api';
+apiFetch('/auth/login')
 
 function getToken() {
   return localStorage.getItem('gigshield_token');
