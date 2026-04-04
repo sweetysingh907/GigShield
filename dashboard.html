@@ -1076,6 +1076,10 @@
 <div id="toast"></div>
 
 <script>
+
+  fetch('https://gigshield-backend.onrender.com/api/health')
+  .then(() => console.log('Backend is awake!'))
+  .catch(() => console.log('Waking up backend...'));
 // ===== CONFIG =====
 const API_BASE = 'https://gigshield-backend-zk17.onrender.com';
 
