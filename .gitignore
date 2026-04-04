@@ -1,0 +1,12 @@
+backend/node_modules
+backend/node_modules/
+node_modules
+node_modules/
+backend/.env
+.env
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/

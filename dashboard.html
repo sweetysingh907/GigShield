@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GigShield Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <a href="index.html" class="sidebar-logo">Gig<span>Shield</span></a>
+  <span class="nav-section">Main</span>
+  <a class="nav-item active" onclick="navigate('overview',this);return false;" href="#">
+    <span class="icon">⬛</span> Overview
+  </a>
+  <a class="nav-item" onclick="navigate('coverage',this);return false;" href="#">
+    <span class="icon">🛡️</span> My Coverage
+  </a>
+  <a class="nav-item" onclick="navigate('payouts',this);return false;" href="#">
+    <span class="icon">💸</span> Payouts
+    <span class="nav-badge">3</span>
+  </a>
+  <a class="nav-item" onclick="navigate('claims',this);return false;" href="#">
+    <span class="icon">📋</span> File a Claim
+  </a>
+  <span class="nav-section">Insights</span>
+  <a class="nav-item" onclick="navigate('analytics',this);return false;" href="#">
+    <span class="icon">📊</span> Analytics
+  </a>
+  <a class="nav-item" onclick="navigate('risk',this);return false;" href="#">
+    <span class="icon">🧠</span> AI Risk Score
+  </a>
+  <a class="nav-item" onclick="navigate('triggers',this);return false;" href="#">
+    <span class="icon">⚡</span> Triggers
+  </a>
+  <span class="nav-section">Account</span>
+  <a class="nav-item" onclick="navigate('platforms',this);return false;" href="#">
+    <span class="icon">🔗</span> Platforms
+  </a>
+  <a class="nav-item" onclick="navigate('profile',this);return false;" href="#">
+    <span class="icon">👤</span> Profile
+  </a>
+  <a class="nav-item" href="index.html">
+    <span class="icon">🏠</span> Back to Home
+  </a>
+  <div class="sidebar-bottom">
+    <div class="user-info" onclick="navigate('profile',null)">
+      <div class="user-avatar" id="sidebar-avatar">U</div>
+      <div>
+        <div class="user-name" id="sidebar-name">Loading...</div>
+        <div class="user-plan" id="sidebar-plan">Connecting...</div>
+      </div>
+    </div>
+    <button onclick="logout()" class="logout-btn">🚪 Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="mobile-menu-btn"
+        onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <div class="page-title" id="pageTitle">Overview</div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn notification-btn" onclick="toggleNotif()">
+        🔔 <span class="notif-dot" id="notifDot"></span>
+      </button>
+      <button class="topbar-btn" onclick="showToast('Report exported as PDF!')">
+        ⬇ Export
+      </button>
+      <button class="topbar-btn primary"
+        onclick="navigate('claims',null)">+ File Claim</button>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS PANEL -->
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-header">
+      <h4>Notifications</h4>
+      <button class="notif-mark" onclick="markAllRead()">Mark all read</button>
+    </div>
+    <div class="notif-item unread">
+      <div class="notif-icon g">⚡</div>
+      <div class="notif-text">
+        <p><strong>Auto-payout triggered!</strong> ₹2,100 sent for Uber downtime.</p>
+        <span>2 min ago</span>
+      </div>
+    </div>
+    <div class="notif-item unread">
+      <div class="notif-icon y">⚠️</div>
+      <div class="notif-text">
+        <p>Income below threshold for 2 days. Monitoring closely.</p>
+        <span>1 hour ago</span>
+      </div>
+    </div>
+    <div class="notif-item unread">
+      <div class="notif-icon b">📊</div>
+      <div class="notif-text">
+        <p>Weekly AI Risk Report is ready. Risk score: 87/100.</p>
+        <span>6 hours ago</span>
+      </div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-icon g">✅</div>
+      <div class="notif-text">
+        <p>Your plan renewal was successful.</p>
+        <span>2 days ago</span>
+      </div>
+    </div>
+    <div class="notif-item">
+      <div class="notif-icon b">🔗</div>
+      <div class="notif-text">
+        <p>Swiggy platform connected and verified.</p>
+        <span>5 days ago</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT AREA -->
+  <div class="content" id="contentArea">
+
+    <!-- ===== OVERVIEW ===== -->
+    <div class="page-view active" id="view-overview">
+      <div class="alert warning" id="alertWeather">
+        <div class="a-icon">🌧️</div>
+        <div>
+          <h5>Rain Alert Active</h5>
+          <p>Heavy rainfall expected. Weather trigger armed — payout ready if income drops 30%.</p>
+        </div>
+        <button class="alert-dismiss"
+          onclick="this.closest('.alert').remove()">✕</button>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">💸</div>
+          <div class="stat-label">Total Payouts (This Month)</div>
+          <div class="stat-value" style="color:var(--accent)">₹8,450</div>
+          <div class="stat-change up">↑ 24% vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📡</div>
+          <div class="stat-label">Active Triggers</div>
+          <div class="stat-value">4</div>
+          <div class="stat-change">
+            <span style="color:var(--accent)">2 armed</span> • 2 monitoring
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🧠</div>
+          <div class="stat-label">AI Risk Score</div>
+          <div class="stat-value" style="color:var(--accent)">
+            87<span style="font-size:1rem;color:var(--muted)">/100</span>
+          </div>
+          <div class="stat-change up">Low Risk</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-label">Coverage Status</div>
+          <div class="stat-value" style="font-size:1.2rem">Active</div>
+          <div class="stat-change up">Renews Apr 12, 2025</div>
+        </div>
+      </div>
+      <div class="grid-2-1">
+        <div class="card">
+          <div class="card-header">
+            <h3>Income vs Payout (Last 6 Months)</h3>
+            <select onchange="showToast('Chart updated to '+this.value+' view.')"
+              style="background:var(--surface2);border:1px solid var(--border);
+              color:var(--muted);padding:5px 10px;border-radius:8px;
+              font-size:0.78rem;outline:none;cursor:pointer;">
+              <option>6 months</option>
+              <option>3 months</option>
+              <option>1 year</option>
+            </select>
+          </div>
+          <div class="chart-container">
+            <canvas id="incomeChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Quick Actions</h3></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn-submit"
+              style="text-align:left;display:flex;align-items:center;gap:10px"
+              onclick="navigate('claims',null)">📋 File a Manual Claim</button>
+            <button class="btn-secondary"
+              style="text-align:left;display:flex;align-items:center;gap:10px"
+              onclick="navigate('coverage',null)">🛡️ Edit Coverage Settings</button>
+            <button class="btn-secondary"
+              style="text-align:left;display:flex;align-items:center;gap:10px"
+              onclick="navigate('platforms',null)">🔗 Connect New Platform</button>
+            <button class="btn-secondary"
+              style="text-align:left;display:flex;align-items:center;gap:10px"
+              onclick="navigate('risk',null)">🧠 View AI Risk Report</button>
+            <button class="btn-secondary"
+              style="text-align:left;display:flex;align-items:center;gap:10px"
+              onclick="openModal('download')">📥 Download Policy Doc</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3>Recent Activity</h3>
+            <button class="card-action"
+              onclick="navigate('payouts',null)">View All</button>
+          </div>
+          <div class="activity-feed">
+            <div class="activity-item">
+              <div class="a-line"></div>
+              <div class="a-dot g">⚡</div>
+              <div class="a-content">
+                <p><strong>₹2,100 payout</strong> — Uber downtime trigger (3h)</p>
+                <span>Today, 9:14 AM</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="a-line"></div>
+              <div class="a-dot y">⚠️</div>
+              <div class="a-content">
+                <p>Income dropped below 70% threshold — monitoring</p>
+                <span>Yesterday, 6:30 PM</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="a-line"></div>
+              <div class="a-dot b">📊</div>
+              <div class="a-content">
+                <p>Weekly AI risk report generated — Low risk</p>
+                <span>Mar 28, 8:00 AM</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="a-dot g">✅</div>
+              <div class="a-content">
+                <p><strong>₹850 payout</strong> — Rain trigger</p>
+                <span>Mar 26, 2:00 PM</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Active Trigger Status</h3>
+            <button class="card-action"
+              onclick="navigate('triggers',null)">Manage</button>
+          </div>
+          <div class="trigger-feed">
+            <div class="trigger-item">
+              <div class="trigger-dot active"></div>
+              <div>
+                <div class="trigger-title">Platform Downtime — Uber</div>
+                <div class="trigger-meta">ARMED • Fires if uptime &lt; 95%</div>
+              </div>
+            </div>
+            <div class="trigger-item">
+              <div class="trigger-dot active"></div>
+              <div>
+                <div class="trigger-title">Weather Trigger — Rain</div>
+                <div class="trigger-meta">ARMED • Heavy rain alert active</div>
+              </div>
+            </div>
+            <div class="trigger-item">
+              <div class="trigger-dot warning"></div>
+              <div>
+                <div class="trigger-title">Income Variance — 30% Drop</div>
+                <div class="trigger-meta">MONITORING • Income at 78% of baseline</div>
+              </div>
+            </div>
+            <div class="trigger-item">
+              <div class="trigger-dot info"></div>
+              <div>
+                <div class="trigger-title">Low Demand Zone</div>
+                <div class="trigger-meta">STANDBY • Demand index 72%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MY COVERAGE ===== -->
+    <div class="page-view" id="view-coverage">
+      <div class="upgrade-banner">
+        <div>
+          <h4 id="banner-plan">You're on the Starter Plan</h4>
+          <p id="banner-sub">Renews in 30 days</p>
+        </div>
+        <button class="btn-submit"
+          style="padding:10px 20px;white-space:nowrap"
+          onclick="openModal('upgrade')">Upgrade Plan →</button>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3>Coverage Limits</h3>
+            <button class="card-action"
+              onclick="showToast('Coverage settings saved!')">Save Changes</button>
+          </div>
+          <div class="coverage-slider-group">
+            <div>
+              <div class="slider-label">
+                <span>Monthly Income Protection</span>
+                <span id="incomeSliderVal">₹1,50,000</span>
+              </div>
+              <input type="range" min="50000" max="500000" step="10000" value="150000"
+                oninput="document.getElementById('incomeSliderVal').textContent=
+                '₹'+parseInt(this.value).toLocaleString('en-IN')">
+            </div>
+            <div>
+              <div class="slider-label">
+                <span>Single Payout Cap</span>
+                <span id="payoutSliderVal">₹25,000</span>
+              </div>
+              <input type="range" min="5000" max="100000" step="5000" value="25000"
+                oninput="document.getElementById('payoutSliderVal').textContent=
+                '₹'+parseInt(this.value).toLocaleString('en-IN')">
+            </div>
+            <div>
+              <div class="slider-label">
+                <span>Income Drop Threshold</span>
+                <span id="threshSliderVal">30%</span>
+              </div>
+              <input type="range" min="10" max="60" step="5" value="30"
+                oninput="document.getElementById('threshSliderVal').textContent=
+                this.value+'%'">
+            </div>
+            <div>
+              <div class="slider-label">
+                <span>Waiting Period (hours)</span>
+                <span id="waitSliderVal">2h</span>
+              </div>
+              <input type="range" min="1" max="12" step="1" value="2"
+                oninput="document.getElementById('waitSliderVal').textContent=
+                this.value+'h'">
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Coverage Breakdown</h3></div>
+          <div class="chart-container">
+            <canvas id="coverageChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Active Coverage Add-ons</h3>
+          <button class="card-action" onclick="openModal('addons')">Add More</button>
+        </div>
+        <div style="display:grid;grid-template-columns:
+          repeat(auto-fit,minmax(200px,1fr));gap:16px">
+          <div class="addon-tile" style="border:1px solid rgba(0,229,160,0.2)">
+            <div style="font-size:1.5rem;margin-bottom:10px">🚑</div>
+            <div style="font-weight:600;margin-bottom:4px">Accident Cover</div>
+            <div style="color:var(--muted);font-size:0.82rem">
+              Up to ₹5L hospitalisation</div>
+            <div style="color:var(--accent);font-size:0.78rem;margin-top:8px">
+              Included in Pro</div>
+          </div>
+          <div class="addon-tile" style="border:1px solid rgba(0,150,255,0.2)">
+            <div style="font-size:1.5rem;margin-bottom:10px">📱</div>
+            <div style="font-weight:600;margin-bottom:4px">Device Protection</div>
+            <div style="color:var(--muted);font-size:0.82rem">
+              Phone & equipment damage</div>
+            <div style="color:var(--accent2);font-size:0.78rem;margin-top:8px">
+              ₹99/mo add-on</div>
+          </div>
+          <div class="addon-tile" style="border:1px solid rgba(245,200,66,0.2)">
+            <div style="font-size:1.5rem;margin-bottom:10px">⚖️</div>
+            <div style="font-weight:600;margin-bottom:4px">Legal Assistance</div>
+            <div style="color:var(--muted);font-size:0.82rem">
+              Dispute resolution support</div>
+            <div style="color:var(--accent4);font-size:0.78rem;margin-top:8px">
+              ₹149/mo add-on</div>
+          </div>
+          <div class="addon-tile"
+            style="cursor:pointer;border:1px dashed var(--border)"
+            onclick="openModal('addons')">
+            <div style="font-size:1.5rem;margin-bottom:10px">➕</div>
+            <div style="font-weight:600;margin-bottom:4px">Add Coverage</div>
+            <div style="color:var(--muted);font-size:0.82rem">
+              Explore more add-ons</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAYOUTS ===== -->
+    <div class="page-view" id="view-payouts">
+      <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card">
+          <div class="stat-label">Total Received</div>
+          <div class="stat-value" style="color:var(--accent)">₹24,850</div>
+          <div class="stat-change up">Lifetime</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">This Month</div>
+          <div class="stat-value">₹8,450</div>
+          <div class="stat-change up">↑ 3 payouts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Payout Time</div>
+          <div class="stat-value">
+            3.8<span style="font-size:1rem;color:var(--muted)">min</span>
+          </div>
+          <div class="stat-change up">Faster than industry</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Payout History</h3>
+          <div style="display:flex;gap:8px">
+            <select id="payoutFilter" onchange="filterPayouts()"
+              style="background:var(--surface2);border:1px solid var(--border);
+              color:var(--muted);padding:6px 10px;border-radius:8px;
+              font-size:0.78rem;outline:none;cursor:pointer">
+              <option value="all">All Payouts</option>
+              <option value="paid">Paid</option>
+              <option value="pending">Pending</option>
+            </select>
+            <button class="card-action"
+              onclick="showToast('CSV export started!')">Export CSV</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="payout-table">
+            <thead>
+              <tr>
+                <th>Date</th><th>Trigger Type</th><th>Platform</th>
+                <th>Amount</th><th>Time to Pay</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="payoutBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FILE A CLAIM ===== -->
+    <div class="page-view" id="view-claims">
+      <div class="alert info">
+        <div class="a-icon">💡</div>
+        <div>
+          <h5>Did you know?</h5>
+          <p>90% of GigShield payouts are automatic. File a manual claim only for
+            incidents not covered by parametric triggers.</p>
+        </div>
+        <button class="alert-dismiss"
+          onclick="this.closest('.alert').remove()">✕</button>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h3>File Manual Claim</h3></div>
+          <div class="claim-form" id="claimForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Incident Date</label>
+                <input type="date" id="cl-date">
+              </div>
+              <div class="form-group">
+                <label>Claim Type</label>
+                <select id="cl-type">
+                  <option>Platform Downtime</option>
+                  <option>Accident / Injury</option>
+                  <option>Weather Disruption</option>
+                  <option>Device Damage</option>
+                  <option>Other Income Loss</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Affected Platform</label>
+              <select id="cl-platform">
+                <option>Uber</option><option>Ola</option>
+                <option>Swiggy</option><option>Zomato</option>
+                <option>Upwork</option><option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Estimated Income Loss (₹)</label>
+              <input type="number" id="cl-amount" placeholder="e.g. 2500">
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="cl-desc" rows="3"
+                placeholder="Describe what happened..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Supporting Evidence (optional)</label>
+              <input type="text" id="cl-evidence"
+                placeholder="Link or reference number">
+            </div>
+            <div style="display:flex;gap:12px">
+              <button class="btn-submit" style="flex:1"
+                onclick="submitClaim()">Submit Claim →</button>
+              <button class="btn-secondary"
+                onclick="resetClaim()">Reset</button>
+            </div>
+          </div>
+          <div id="claimSuccess" style="display:none">
+            <div class="empty-state">
+              <span class="icon">✅</span>
+              <h4>Claim Submitted!</h4>
+              <p>Claim #GS-2025-0412 submitted. We'll review within 24 hours.</p>
+              <button class="btn-submit"
+                onclick="resetClaim()">File Another Claim</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Claim History</h3></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="claim-history-item">
+              <div style="display:flex;justify-content:space-between;
+                align-items:center;margin-bottom:6px">
+                <span style="font-weight:600;font-size:0.9rem">#GS-2025-0311</span>
+                <span class="status-badge paid">Paid</span>
+              </div>
+              <div style="color:var(--muted);font-size:0.82rem">
+                Uber downtime — ₹1,800 • Mar 11, 2025</div>
+            </div>
+            <div class="claim-history-item">
+              <div style="display:flex;justify-content:space-between;
+                align-items:center;margin-bottom:6px">
+                <span style="font-weight:600;font-size:0.9rem">#GS-2025-0228</span>
+                <span class="status-badge paid">Paid</span>
+              </div>
+              <div style="color:var(--muted);font-size:0.82rem">
+                Accident cover — ₹12,000 • Feb 28, 2025</div>
+            </div>
+            <div class="claim-history-item">
+              <div style="display:flex;justify-content:space-between;
+                align-items:center;margin-bottom:6px">
+                <span style="font-weight:600;font-size:0.9rem">#GS-2025-0215</span>
+                <span class="status-badge pending">Pending</span>
+              </div>
+              <div style="color:var(--muted);font-size:0.82rem">
+                Device damage — ₹4,500 • Feb 15, 2025</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ANALYTICS ===== -->
+    <div class="page-view" id="view-analytics">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Avg Daily Income</div>
+          <div class="stat-value">₹1,240</div>
+          <div class="stat-change up">↑ 8% this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Coverage Utilization</div>
+          <div class="stat-value">34%</div>
+          <div class="stat-change">of monthly limit</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Protected Hours</div>
+          <div class="stat-value">847</div>
+          <div class="stat-change up">This year</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Premiums Paid</div>
+          <div class="stat-value">₹4,194</div>
+          <div class="stat-change">Last 6 months</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><h3>Daily Income (Last 30 Days)</h3></div>
+          <div class="chart-container">
+            <canvas id="dailyChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Payout Triggers Breakdown</h3></div>
+          <div class="chart-container"
+            style="display:flex;align-items:center;justify-content:center">
+            <canvas id="triggerPieChart"
+              style="max-height:200px;max-width:200px"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Income Trend by Platform</h3>
+          <button class="card-action"
+            onclick="showToast('Report exported!')">Export</button>
+        </div>
+        <div class="chart-container">
+          <canvas id="platformChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== AI RISK SCORE ===== -->
+    <div class="page-view" id="view-risk">
+      <div class="grid-1-2">
+        <div class="card" style="text-align:center">
+          <div class="card-header" style="justify-content:center">
+            <h3>Your AI Risk Score</h3>
+          </div>
+          <div class="gauge-ring">
+            <svg viewBox="0 0 160 160" width="160" height="160">
+              <circle cx="80" cy="80" r="64" fill="none"
+                stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+              <circle cx="80" cy="80" r="64" fill="none"
+                stroke="var(--accent)" stroke-width="12"
+                stroke-dasharray="402" stroke-dashoffset="87"
+                stroke-linecap="round"/>
+            </svg>
+            <div class="gauge-num">
+              <div class="big" style="color:var(--accent)">87</div>
+              <div class="lbl">/ 100</div>
+            </div>
+          </div>
+          <div class="risk-level-badge">LOW RISK</div>
+          <p style="color:var(--muted);font-size:0.85rem;line-height:1.6;
+            margin-top:12px">
+            Your income is stable and platforms are performing well.</p>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Risk Factor Analysis</h3></div>
+          <div class="risk-factors">
+            <div class="risk-factor-row">
+              <span>Platform Reliability</span>
+              <div class="risk-factor-bar">
+                <div class="rfb-fill g" style="width:96%"></div>
+              </div>
+              <span style="color:var(--accent)">96%</span>
+            </div>
+            <div class="risk-factor-row">
+              <span>Income Stability</span>
+              <div class="risk-factor-bar">
+                <div class="rfb-fill g" style="width:82%"></div>
+              </div>
+              <span style="color:var(--accent)">82%</span>
+            </div>
+            <div class="risk-factor-row">
+              <span>Weather Exposure</span>
+              <div class="risk-factor-bar">
+                <div class="rfb-fill y" style="width:44%"></div>
+              </div>
+              <span style="color:var(--accent4)">44%</span>
+            </div>
+            <div class="risk-factor-row">
+              <span>Demand Zone Risk</span>
+              <div class="risk-factor-bar">
+                <div class="rfb-fill g" style="width:28%"></div>
+              </div>
+              <span style="color:var(--accent)">28%</span>
+            </div>
+            <div class="risk-factor-row">
+              <span>Seasonal Variance</span>
+              <div class="risk-factor-bar">
+                <div class="rfb-fill y" style="width:55%"></div>
+              </div>
+              <span style="color:var(--accent4)">55%</span>
+            </div>
+            <div class="risk-factor-row">
+              <span>Account Health</span>
+              <div class="risk-factor-bar">
+                <div class="rfb-fill g" style="width:91%"></div>
+              </div>
+              <span style="color:var(--accent)">91%</span>
+            </div>
+          </div>
+          <div class="ai-recommendations">
+            <h4>AI Recommendations</h4>
+            <ul>
+              <li><span style="color:var(--accent)">→</span>
+                Enable monsoon weather trigger for Jun–Sep</li>
+              <li><span style="color:var(--accent4)">→</span>
+                Income dip on weekends — consider weekend buffer trigger</li>
+              <li><span style="color:var(--accent)">→</span>
+                Add Zomato to improve income diversification score</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Risk Score History</h3>
+          <button class="card-action"
+            onclick="showToast('Risk report downloaded!')">Download</button>
+        </div>
+        <div class="chart-container">
+          <canvas id="riskHistoryChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TRIGGERS ===== -->
+    <div class="page-view" id="view-triggers">
+      <div class="alert success">
+        <div class="a-icon">⚡</div>
+        <div>
+          <h5>2 Triggers Armed</h5>
+          <p>Platform downtime and weather triggers are active and watching.</p>
+        </div>
+        <button class="alert-dismiss"
+          onclick="this.closest('.alert').remove()">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px"
+        id="triggerList"></div>
+      <div style="text-align:center;margin-top:20px">
+        <button class="btn-submit"
+          style="width:auto;padding:12px 28px"
+          onclick="openModal('trigger')">+ Add New Trigger</button>
+      </div>
+    </div>
+
+    <!-- ===== PLATFORMS ===== -->
+    <div class="page-view" id="view-platforms">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3>Connected Platforms</h3>
+            <button class="card-action"
+              onclick="openModal('connect')">+ Connect New</button>
+          </div>
+          <div class="platform-list" id="platformList"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Earnings by Platform</h3></div>
+          <div class="chart-container">
+            <canvas id="earningsPieChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PROFILE ===== -->
+    <div class="page-view" id="view-profile">
+      <div class="profile-header">
+        <div class="profile-avatar-big" id="profile-avatar-big">U</div>
+        <div class="profile-meta">
+          <h2 id="profile-heading-name">Loading...</h2>
+          <p id="profile-heading-sub">Loading...</p>
+          <div class="profile-badge" id="profile-heading-badge">Loading...</div>
+        </div>
+        <button class="btn-submit"
+          style="margin-left:auto;padding:10px 20px"
+          onclick="openEditProfileModal()">Edit Profile</button>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3>Personal Information</h3>
+            <button class="card-action"
+              onclick="openEditProfileModal()">Edit</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="info-row">
+              <span class="info-label">Full Name</span>
+              <span class="info-val" id="info-name">—</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Mobile</span>
+              <span class="info-val" id="info-phone">—</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Email</span>
+              <span class="info-val" id="info-email">—</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">City</span>
+              <span class="info-val" id="info-city">—</span>
+            </div>
+            <div class="info-row" style="border:none">
+              <span class="info-label">UPI ID</span>
+              <span class="info-val" id="info-upi">—</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Plan & Billing</h3>
+            <button class="card-action"
+              onclick="openModal('upgrade')">Upgrade</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="info-row">
+              <span class="info-label">Current Plan</span>
+              <span class="info-val" id="info-plan"
+                style="color:var(--accent)">—</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Premium</span>
+              <span class="info-val" id="info-premium">—</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Member Since</span>
+              <span class="info-val" id="info-since">—</span>
+            </div>
+            <div class="info-row" style="border:none">
+              <span class="info-label">Payment Method</span>
+              <span class="info-val">UPI Auto-pay</span>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:4px">
+              <button class="btn-secondary" style="flex:1"
+                onclick="showToast('Payment method updated!')">
+                Change Payment</button>
+              <button class="btn-secondary" style="color:var(--accent3)"
+                onclick="showToast('Please contact support to cancel.')">
+                Cancel Plan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ===== AUTH GATE MODAL ===== -->
+<div class="modal-overlay" id="modal-authgate" style="z-index:9000">
+  <div class="modal" style="max-width:460px">
+    <div class="auth-tabs">
+      <button id="tab-login" onclick="switchAuthTab('login')"
+        class="auth-tab auth-tab-active">Log In</button>
+      <button id="tab-register" onclick="switchAuthTab('register')"
+        class="auth-tab">Register</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="auth-login-view">
+      <h3 style="margin-bottom:6px">Welcome back 👋</h3>
+      <p style="color:var(--muted);font-size:0.88rem;margin-bottom:24px">
+        Log in to your GigShield account</p>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@email.com"
+          onkeydown="if(event.key==='Enter')handleLogin()">
+      </div>
+      <div class="form-group" style="margin-bottom:8px">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Your password"
+          onkeydown="if(event.key==='Enter')handleLogin()">
+      </div>
+      <div id="login-error" class="auth-error"></div>
+      <button class="btn-submit" id="login-btn"
+        onclick="handleLogin()">Log In →</button>
+      <p class="auth-switch">Don't have an account?
+        <a href="#" onclick="switchAuthTab('register');return false;">
+          Register here</a></p>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="auth-register-view" style="display:none">
+      <h3 style="margin-bottom:6px">Create your account 🚀</h3>
+      <p style="color:var(--muted);font-size:0.88rem;margin-bottom:24px">
+        30-day free trial • No credit card needed</p>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="Your full name">
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="you@email.com">
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Mobile Number</label>
+        <input type="tel" id="reg-phone" placeholder="10-digit number">
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="Min 6 characters">
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Primary Gig Platform</label>
+        <select id="reg-platform">
+          <option>Uber / Ola</option>
+          <option>Swiggy / Zomato</option>
+          <option>Upwork / Freelancer</option>
+          <option>Amazon Flex</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div id="reg-error" class="auth-error"></div>
+      <button class="btn-submit" id="reg-btn"
+        onclick="handleRegister()">Create Account →</button>
+      <p class="auth-switch">Already have an account?
+        <a href="#" onclick="switchAuthTab('login');return false;">
+          Log in here</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- UPGRADE MODAL -->
+<div class="modal-overlay" id="modal-upgrade">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('upgrade')">✕</button>
+    <h3>Upgrade Your Plan</h3>
+    <p>Unlock more coverage, faster payouts, and advanced AI features.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <div class="plan-option" onclick="selectUpgrade('Pro','699')">
+        <div>
+          <div style="font-weight:700">Pro Plan</div>
+          <div style="color:var(--muted);font-size:0.82rem">
+            Income protection up to ₹1.5L + accident cover</div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;
+          color:var(--accent)">₹699/mo</div>
+      </div>
+      <div class="plan-option" onclick="selectUpgrade('Enterprise','1499')">
+        <div>
+          <div style="font-weight:700">Enterprise Plan</div>
+          <div style="color:var(--muted);font-size:0.82rem">
+            Unlimited coverage + &lt;2 min payouts + manager</div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;
+          color:var(--accent2)">₹1,499/mo</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD-ONS MODAL -->
+<div class="modal-overlay" id="modal-addons">
+  <div class="modal" style="max-width:520px">
+    <button class="modal-close" onclick="closeModal('addons')">✕</button>
+    <h3>Add Coverage</h3>
+    <p>Enhance your plan with add-on modules.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <label class="addon-check-item">
+        <input type="checkbox" id="addon1"
+          style="width:18px;height:18px;accent-color:var(--accent)">
+        <div>
+          <div style="font-weight:600;font-size:0.9rem">
+            📱 Device Protection — ₹99/mo</div>
+          <div style="color:var(--muted);font-size:0.8rem">
+            Phone & equipment damage up to ₹30,000</div>
+        </div>
+      </label>
+      <label class="addon-check-item">
+        <input type="checkbox" id="addon2"
+          style="width:18px;height:18px;accent-color:var(--accent)">
+        <div>
+          <div style="font-weight:600;font-size:0.9rem">
+            ⚖️ Legal Assistance — ₹149/mo</div>
+          <div style="color:var(--muted);font-size:0.8rem">
+            Platform dispute resolution & legal support</div>
+        </div>
+      </label>
+      <label class="addon-check-item">
+        <input type="checkbox" id="addon3"
+          style="width:18px;height:18px;accent-color:var(--accent)">
+        <div>
+          <div style="font-weight:600;font-size:0.9rem">
+            🧘 Mental Wellness — ₹49/mo</div>
+          <div style="color:var(--muted);font-size:0.8rem">
+            24/7 counseling & wellness apps</div>
+        </div>
+      </label>
+    </div>
+    <button class="btn-submit" onclick="addAddons()">
+      Add Selected Add-ons →</button>
+  </div>
+</div>
+
+<!-- CONNECT PLATFORM MODAL -->
+<div class="modal-overlay" id="modal-connect">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('connect')">✕</button>
+    <h3>Connect a Platform</h3>
+    <p>Link your gig platform to enable automatic income monitoring.</p>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Select Platform</label>
+      <select id="newPlatform">
+        <option>Zomato</option><option>Dunzo</option>
+        <option>Amazon Flex</option><option>Porter</option>
+        <option>Rapido</option><option>Fiverr</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>API Key / Auth Token</label>
+      <input type="text" id="newPlatformKey"
+        placeholder="Paste your API key here">
+    </div>
+    <button class="btn-submit"
+      onclick="connectPlatform()">Connect Platform →</button>
+  </div>
+</div>
+
+<!-- ADD TRIGGER MODAL -->
+<div class="modal-overlay" id="modal-trigger">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('trigger')">✕</button>
+    <h3>Add New Trigger</h3>
+    <p>Define a parametric rule to auto-trigger payouts.</p>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Trigger Type</label>
+      <select id="newTriggerType">
+        <option>Platform Downtime</option><option>Weather Event</option>
+        <option>Income Drop</option><option>Low Demand Zone</option>
+        <option>Custom Rule</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Threshold</label>
+      <input type="text" id="newTriggerThresh"
+        placeholder="e.g. 95% uptime, 30% income drop">
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Payout Amount (₹)</label>
+      <input type="number" id="newTriggerPayout" placeholder="e.g. 2000">
+    </div>
+    <button class="btn-submit"
+      onclick="addTrigger()">Add Trigger →</button>
+  </div>
+</div>
+
+<!-- DOWNLOAD MODAL -->
+<div class="modal-overlay" id="modal-download">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('download')">✕</button>
+    <h3>Download Policy Documents</h3>
+    <p>All your insurance documents in one place.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+      <button class="btn-secondary" style="text-align:left"
+        onclick="showToast('Policy Certificate downloading...');
+        closeModal('download')">📄 Policy Certificate (PDF)</button>
+      <button class="btn-secondary" style="text-align:left"
+        onclick="showToast('Terms downloading...');
+        closeModal('download')">📋 Terms & Conditions (PDF)</button>
+      <button class="btn-secondary" style="text-align:left"
+        onclick="showToast('Payout history downloading...');
+        closeModal('download')">📊 Payout History (CSV)</button>
+      <button class="btn-secondary" style="text-align:left"
+        onclick="showToast('Tax statement downloading...');
+        closeModal('download')">🧾 Tax Statement (PDF)</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="modal-editprofile">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('editprofile')">✕</button>
+    <h3>Edit Profile</h3>
+    <p>Update your personal information.</p>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Full Name</label>
+      <input type="text" id="ep-name" placeholder="Your name">
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Mobile</label>
+      <input type="tel" id="ep-phone" placeholder="10-digit number">
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>UPI ID</label>
+      <input type="text" id="ep-upi" placeholder="yourname@upi">
+    </div>
+    <div class="form-group" style="margin-bottom:20px">
+      <label>City</label>
+      <input type="text" id="ep-city" placeholder="Your city">
+    </div>
+    <button class="btn-submit"
+      onclick="saveProfile()">Save Changes →</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ===== CONFIG =====
+const API_BASE = 'http://127.0.0.1:5000/api';
+
+function getToken() {
+  return localStorage.getItem('gigshield_token');
+}
+function getUser() {
+  const u = localStorage.getItem('gigshield_user');
+  return u ? JSON.parse(u) : null;
+}
+function saveSession(token, user) {
+  localStorage.setItem('gigshield_token', token);
+  localStorage.setItem('gigshield_user', JSON.stringify(user));
+}
+function clearSession() {
+  localStorage.removeItem('gigshield_token');
+  localStorage.removeItem('gigshield_user');
+}
+
+async function apiFetch(endpoint, options = {}) {
+  const token = getToken();
+  try {
+    const res = await fetch(API_BASE + endpoint, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: 'Bearer ' + token } : {}),
+        ...(options.headers || {})
+      },
+      body: options.body ? JSON.stringify(options.body) : undefined
+    });
+    return res.json();
+  } catch (e) {
+    return { success: false, message: 'Cannot connect to server. Is the backend running?' };
+  }
+}
+
+// ===== LOAD USER INTO UI =====
+function loadUserIntoUI(user) {
+  if (!user) return;
+  const initials = user.name
+    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'U';
+  const planName = (user.plan || 'starter').charAt(0).toUpperCase() +
+    (user.plan || 'starter').slice(1);
+  const premiums = { starter: '₹299/month', pro: '₹699/month', enterprise: '₹1,499/month' };
+
+  // Sidebar
+  const sideAvatar = document.getElementById('sidebar-avatar');
+  if (sideAvatar) sideAvatar.textContent = initials;
+  const sideName = document.getElementById('sidebar-name');
+  if (sideName) sideName.textContent = user.name || 'User';
+  const sidePlan = document.getElementById('sidebar-plan');
+  if (sidePlan) sidePlan.textContent = planName + ' Plan • Active';
+
+  // Coverage banner
+  const bannerPlan = document.getElementById('banner-plan');
+  if (bannerPlan) bannerPlan.textContent = "You're on the " + planName + " Plan";
+
+  // Profile page
+  const profAvatar = document.getElementById('profile-avatar-big');
+  if (profAvatar) profAvatar.textContent = initials;
+  const profName = document.getElementById('profile-heading-name');
+  if (profName) profName.textContent = user.name || '';
+  const profSub = document.getElementById('profile-heading-sub');
+  if (profSub) profSub.textContent =
+    (user.email || '') + (user.phone ? ' • +91 ' + user.phone : '');
+  const profBadge = document.getElementById('profile-heading-badge');
+  if (profBadge) profBadge.textContent = planName + ' Plan · Active since ' +
+    new Date(user.createdAt || Date.now()).toLocaleDateString('en-IN',
+      { month: 'short', year: 'numeric' });
+
+  // Info rows
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val || '—';
+  };
+  set('info-name', user.name);
+  set('info-phone', user.phone ? '+91 ' + user.phone : null);
+  set('info-email', user.email);
+  set('info-city', user.city);
+  set('info-upi', user.upiId);
+  set('info-plan', planName + ' Plan');
+  set('info-premium', premiums[user.plan] || '₹299/month');
+  set('info-since', new Date(user.createdAt || Date.now())
+    .toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }));
+}
+
+// ===== AUTH CHECK =====
+function checkAuth() {
+  const token = getToken();
+  const user = getUser();
+  if (!token || !user) {
+    openModal('authgate');
+    return false;
+  }
+  loadUserIntoUI(user);
+  return true;
+}
+
+// ===== AUTH: LOGIN =====
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+  if (!email || !password) {
+    errEl.textContent = 'Please enter email and password.';
+    return;
+  }
+  const btn = document.getElementById('login-btn');
+  btn.textContent = 'Logging in...';
+  btn.disabled = true;
+  const data = await apiFetch('/auth/login', {
+    method: 'POST', body: { email, password }
+  });
+  btn.textContent = 'Log In →';
+  btn.disabled = false;
+  if (data.success) {
+    saveSession(data.token, data.data);
+    document.getElementById('modal-authgate').classList.remove('open');
+    loadUserIntoUI(data.data);
+    showToast('Welcome back, ' + data.data.name + '! 👋');
+    navigate('overview', document.querySelector('.nav-item'));
+    setTimeout(initOverviewCharts, 200);
+  } else {
+    errEl.textContent = data.message || 'Login failed. Please try again.';
+  }
+}
+
+// ===== AUTH: REGISTER =====
+async function handleRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const password = document.getElementById('reg-password').value.trim();
+  const platform = document.getElementById('reg-platform').value;
+  const errEl = document.getElementById('reg-error');
+  errEl.textContent = '';
+  if (!name || !email || !phone || !password) {
+    errEl.textContent = 'Please fill all fields.'; return;
+  }
+  if (!/^\d{10}$/.test(phone)) {
+    errEl.textContent = 'Enter a valid 10-digit mobile number.'; return;
+  }
+  if (password.length < 6) {
+    errEl.textContent = 'Password must be at least 6 characters.'; return;
+  }
+  const btn = document.getElementById('reg-btn');
+  btn.textContent = 'Creating account...';
+  btn.disabled = true;
+  const data = await apiFetch('/auth/register', {
+    method: 'POST', body: { name, email, phone, password, primaryPlatform: platform }
+  });
+  btn.textContent = 'Create Account →';
+  btn.disabled = false;
+  if (data.success) {
+    saveSession(data.token, data.data);
+    document.getElementById('modal-authgate').classList.remove('open');
+    loadUserIntoUI(data.data);
+    showToast('Welcome to GigShield, ' + data.data.name + '! 🎉');
+    navigate('overview', document.querySelector('.nav-item'));
+    setTimeout(initOverviewCharts, 200);
+  } else {
+    errEl.textContent = data.message || 'Registration failed. Please try again.';
+  }
+}
+
+// ===== SWITCH AUTH TABS =====
+function switchAuthTab(tab) {
+  document.getElementById('tab-login')
+    .classList.toggle('auth-tab-active', tab === 'login');
+  document.getElementById('tab-register')
+    .classList.toggle('auth-tab-active', tab === 'register');
+  document.getElementById('auth-login-view').style.display =
+    tab === 'login' ? 'block' : 'none';
+  document.getElementById('auth-register-view').style.display =
+    tab === 'register' ? 'block' : 'none';
+}
+
+// ===== LOGOUT =====
+function logout() {
+  clearSession();
+  showToast('Logged out successfully.');
+  setTimeout(() => {
+    openModal('authgate');
+    switchAuthTab('login');
+  }, 500);
+}
+
+// ===== SAVE PROFILE =====
+async function saveProfile() {
+  const name = document.getElementById('ep-name').value.trim();
+  const phone = document.getElementById('ep-phone').value.trim();
+  const upiId = document.getElementById('ep-upi').value.trim();
+  const city = document.getElementById('ep-city').value.trim();
+  const data = await apiFetch('/auth/update', {
+    method: 'PUT', body: { name, phone, upiId, city }
+  });
+  if (data.success) {
+    saveSession(getToken(), data.data);
+    loadUserIntoUI(data.data);
+    closeModal('editprofile');
+    showToast('Profile updated successfully! ✅');
+  } else {
+    showToast(data.message || 'Update failed.');
+  }
+}
+
+// ===== OPEN EDIT PROFILE MODAL =====
+function openEditProfileModal() {
+  const user = getUser();
+  if (!user) return;
+  document.getElementById('ep-name').value = user.name || '';
+  document.getElementById('ep-phone').value = user.phone || '';
+  document.getElementById('ep-upi').value = user.upiId || '';
+  document.getElementById('ep-city').value = user.city || '';
+  openModal('editprofile');
+}
+
+// ===== UPGRADE =====
+function selectUpgrade(plan, price) {
+  closeModal('upgrade');
+  showToast('Upgrading to ' + plan + ' Plan (₹' + price + '/mo)... Confirmation SMS sent!');
+}
+
+// ===== NAVIGATION =====
+const pageTitles = {
+  overview: 'Overview', coverage: 'My Coverage', payouts: 'Payouts',
+  claims: 'File a Claim', analytics: 'Analytics', risk: 'AI Risk Score',
+  triggers: 'Triggers', platforms: 'Platforms', profile: 'Profile'
+};
+function navigate(page, el) {
+  document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + page);
+  if (view) view.classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('pageTitle').textContent = pageTitles[page] || page;
+  document.getElementById('contentArea').scrollTop = 0;
+  closeNotifPanel();
+  if (page === 'payouts') renderPayouts();
+  if (page === 'triggers') renderTriggers();
+  if (page === 'platforms') { renderPlatforms(); initPlatformChart(); }
+  if (page === 'analytics') initAnalyticsCharts();
+  if (page === 'risk') initRiskChart();
+  if (page === 'coverage') initCoverageChart();
+  if (page === 'profile') loadUserIntoUI(getUser());
+  return false;
+}
+
+// ===== NOTIFICATIONS =====
+function toggleNotif() {
+  document.getElementById('notifPanel').classList.toggle('open');
+}
+function closeNotifPanel() {
+  document.getElementById('notifPanel').classList.remove('open');
+}
+function markAllRead() {
+  document.querySelectorAll('.notif-item.unread')
+    .forEach(el => el.classList.remove('unread'));
+  document.getElementById('notifDot').style.display = 'none';
+  showToast('All notifications marked as read.');
+  closeNotifPanel();
+}
+document.addEventListener('click', e => {
+  const panel = document.getElementById('notifPanel');
+  if (panel.classList.contains('open') &&
+      !panel.contains(e.target) &&
+      !e.target.closest('.notification-btn')) closeNotifPanel();
+});
+
+// ===== MODALS =====
+function openModal(id) {
+  document.getElementById('modal-' + id).classList.add('open');
+}
+function closeModal(id) {
+  if (id === 'authgate' && !getToken()) return;
+  document.getElementById('modal-' + id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => {
+    const id = el.id.replace('modal-', '');
+    if (e.target === el && id !== 'authgate') el.classList.remove('open');
+  });
+});
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===== DATA =====
+const payouts = [
+  {date:'Mar 31, 2025',type:'Platform Downtime',platform:'Uber',
+    amount:'₹2,100',time:'3.2 min',status:'paid'},
+  {date:'Mar 29, 2025',type:'Weather Trigger',platform:'Swiggy',
+    amount:'₹850',time:'4.1 min',status:'paid'},
+  {date:'Mar 26, 2025',type:'Income Drop',platform:'Upwork',
+    amount:'₹1,400',time:'2.8 min',status:'paid'},
+  {date:'Mar 22, 2025',type:'Platform Downtime',platform:'Ola',
+    amount:'₹3,200',time:'2.1 min',status:'paid'},
+  {date:'Mar 18, 2025',type:'Weather Trigger',platform:'Swiggy',
+    amount:'₹1,100',time:'5.0 min',status:'paid'},
+  {date:'Mar 15, 2025',type:'Income Drop',platform:'Uber',
+    amount:'₹900',time:'3.9 min',status:'paid'},
+  {date:'Apr 01, 2025',type:'Platform Downtime',platform:'Uber',
+    amount:'₹2,500',time:'-',status:'pending'},
+];
+const triggers = [
+  {id:1,name:'Platform Downtime — Uber',status:'armed',
+    threshold:'Uptime < 95% for 60+ mins',payout:'₹2,100/trigger',icon:'📡'},
+  {id:2,name:'Weather Trigger — Rain',status:'armed',
+    threshold:'Rainfall > 20mm in 3h',payout:'₹850/trigger',icon:'🌧️'},
+  {id:3,name:'Income Drop — 30%',status:'monitoring',
+    threshold:'Income < 70% of baseline',payout:'Up to ₹5,000',icon:'📉'},
+  {id:4,name:'Low Demand Zone',status:'standby',
+    threshold:'Demand index < 50%',payout:'₹500/trigger',icon:'🗺️'},
+];
+const platforms = [
+  {name:'Uber',icon:'🚗',bg:'rgba(0,0,0,0.4)',connected:true,earnings:'₹28,400'},
+  {name:'Swiggy',icon:'🛵',bg:'rgba(255,90,15,0.1)',connected:true,earnings:'₹8,200'},
+  {name:'Upwork',icon:'💼',bg:'rgba(20,175,95,0.1)',connected:true,earnings:'₹12,100'},
+  {name:'Ola',icon:'🟡',bg:'rgba(245,200,66,0.1)',connected:false,earnings:'—'},
+  {name:'Zomato',icon:'🍕',bg:'rgba(220,50,50,0.1)',connected:false,earnings:'—'},
+];
+let chartsInitialized = {};
+
+// ===== PAYOUTS =====
+function renderPayouts(filter = 'all') {
+  const data = filter === 'all' ? payouts : payouts.filter(p => p.status === filter);
+  document.getElementById('payoutBody').innerHTML = data.map(p => `
+    <tr>
+      <td>${p.date}</td><td>${p.type}</td><td>${p.platform}</td>
+      <td style="font-family:'Syne',sans-serif;font-weight:700;
+        color:${p.status==='paid'?'var(--accent)':'var(--accent4)'}">
+        ${p.amount}</td>
+      <td style="color:var(--muted)">${p.time}</td>
+      <td><span class="status-badge ${p.status}">
+        ${p.status.charAt(0).toUpperCase()+p.status.slice(1)}</span></td>
+    </tr>`).join('');
+}
+function filterPayouts() {
+  renderPayouts(document.getElementById('payoutFilter').value);
+}
+
+// ===== TRIGGERS =====
+function renderTriggers() {
+  document.getElementById('triggerList').innerHTML = triggers.map(t => `
+    <div class="card" style="display:flex;align-items:center;gap:20px">
+      <div style="font-size:2rem;flex-shrink:0">${t.icon}</div>
+      <div style="flex:1">
+        <div style="font-weight:600;margin-bottom:4px">${t.name}</div>
+        <div style="color:var(--muted);font-size:0.82rem">
+          Threshold: ${t.threshold} • Payout: ${t.payout}</div>
+      </div>
+      <span class="status-badge ${t.status==='armed'?'paid':
+        t.status==='monitoring'?'pending':'triggered'}">
+        ${t.status.toUpperCase()}</span>
+      <label class="platform-toggle">
+        <input type="checkbox" ${t.status!=='standby'?'checked':''}
+          onchange="toggleTrigger(${t.id},this)">
+        <span class="toggle-slider"></span>
+      </label>
+      <button class="card-action"
+        onclick="showToast('Trigger settings opened.')">Edit</button>
+    </div>`).join('');
+}
+function toggleTrigger(id, el) {
+  const t = triggers.find(x => x.id === id);
+  if (t) {
+    t.status = el.checked ? 'armed' : 'standby';
+    showToast(t.name + (el.checked ? ' enabled!' : ' disabled.'));
+    renderTriggers();
+  }
+}
+
+// ===== PLATFORMS =====
+function renderPlatforms() {
+  document.getElementById('platformList').innerHTML = platforms.map((p, i) => `
+    <div class="platform-row">
+      <div class="platform-icon" style="background:${p.bg}">${p.icon}</div>
+      <div class="platform-info">
+        <div class="platform-name">${p.name}</div>
+        <div class="platform-status">
+          ${p.connected?'Connected • Monitored':'Not connected'}</div>
+      </div>
+      <div class="platform-earnings"
+        style="color:${p.connected?'var(--accent)':'var(--muted)'}">
+        ${p.earnings}</div>
+      <label class="platform-toggle">
+        <input type="checkbox" ${p.connected?'checked':''}
+          onchange="togglePlatform(${i},this)">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>`).join('');
+}
+function togglePlatform(idx, el) {
+  platforms[idx].connected = el.checked;
+  showToast(platforms[idx].name + (el.checked ? ' connected!' : ' disconnected.'));
+  renderPlatforms();
+}
+
+// ===== CLAIM =====
+function submitClaim() {
+  const date = document.getElementById('cl-date').value;
+  const amount = document.getElementById('cl-amount').value;
+  const desc = document.getElementById('cl-desc').value;
+  if (!date || !amount || !desc) {
+    showToast('Please fill in date, amount, and description.'); return;
+  }
+  document.getElementById('claimForm').style.display = 'none';
+  document.getElementById('claimSuccess').style.display = 'block';
+}
+function resetClaim() {
+  document.getElementById('claimForm').style.display = 'flex';
+  document.getElementById('claimSuccess').style.display = 'none';
+  ['cl-date','cl-amount','cl-desc','cl-evidence']
+    .forEach(id => document.getElementById(id).value = '');
+}
+
+// ===== ADD-ONS =====
+function addAddons() {
+  const selected = [];
+  if (document.getElementById('addon1').checked) selected.push('Device Protection');
+  if (document.getElementById('addon2').checked) selected.push('Legal Assistance');
+  if (document.getElementById('addon3').checked) selected.push('Mental Wellness');
+  if (!selected.length) { showToast('Please select at least one add-on.'); return; }
+  closeModal('addons');
+  showToast(selected.join(', ') + ' added to your plan!');
+}
+
+// ===== CONNECT PLATFORM =====
+function connectPlatform() {
+  const name = document.getElementById('newPlatform').value;
+  const key = document.getElementById('newPlatformKey').value;
+  if (!key) { showToast('Please enter an API key.'); return; }
+  closeModal('connect');
+  showToast(name + ' connected successfully!');
+  const ex = platforms.find(p => p.name === name);
+  if (ex) ex.connected = true;
+  else platforms.push({
+    name, icon:'🔗', bg:'rgba(255,255,255,0.05)',
+    connected:true, earnings:'₹0'
+  });
+  renderPlatforms();
+}
+
+// ===== ADD TRIGGER =====
+function addTrigger() {
+  const type = document.getElementById('newTriggerType').value;
+  const thresh = document.getElementById('newTriggerThresh').value;
+  const payout = document.getElementById('newTriggerPayout').value;
+  if (!thresh || !payout) { showToast('Please fill all fields.'); return; }
+  triggers.push({
+    id: triggers.length + 1,
+    name: type + ' — Custom',
+    status: 'standby',
+    threshold: thresh,
+    payout: '₹' + payout + '/trigger',
+    icon: '⚙️'
+  });
+  closeModal('trigger');
+  showToast('New trigger added!');
+  renderTriggers();
+}
+
+// ===== CHARTS =====
+const chartDefaults = {
+  responsive: true, maintainAspectRatio: true,
+  plugins: { legend: { labels: { color:'#7a8394', font:{ family:'DM Sans' } } } }
+};
+const gridOpts = {
+  grid: { color:'rgba(255,255,255,0.04)' }, ticks: { color:'#7a8394' }
+};
+
+function initOverviewCharts() {
+  if (chartsInitialized.overview) return;
+  chartsInitialized.overview = true;
+  new Chart(document.getElementById('incomeChart').getContext('2d'), {
+    type:'bar',
+    data:{
+      labels:['Oct','Nov','Dec','Jan','Feb','Mar'],
+      datasets:[
+        { label:'Income (₹)',
+          data:[28000,31000,22000,34000,29000,36000],
+          backgroundColor:'rgba(0,150,255,0.3)',borderColor:'#0096ff',
+          borderWidth:1.5,borderRadius:6 },
+        { label:'Payouts (₹)',
+          data:[0,2100,4200,1800,3400,8450],
+          backgroundColor:'rgba(0,229,160,0.3)',borderColor:'#00e5a0',
+          borderWidth:1.5,borderRadius:6 }
+      ]
+    },
+    options:{
+      ...chartDefaults,
+      scales:{
+        x:{...gridOpts},
+        y:{...gridOpts,ticks:{...gridOpts.ticks,callback:v=>'₹'+(v/1000)+'k'}}
+      }
+    }
+  });
+}
+
+function initCoverageChart() {
+  if (chartsInitialized.coverage) return;
+  chartsInitialized.coverage = true;
+  new Chart(document.getElementById('coverageChart').getContext('2d'), {
+    type:'doughnut',
+    data:{
+      labels:['Income Protection','Accident Cover','Device','Unused'],
+      datasets:[{ data:[60,25,5,10],
+        backgroundColor:['#00e5a0','#0096ff','#f5c842',
+          'rgba(255,255,255,0.06)'], borderWidth:0 }]
+    },
+    options:{ ...chartDefaults, cutout:'65%' }
+  });
+}
+
+function initPlatformChart() {
+  if (chartsInitialized.platformPie) return;
+  chartsInitialized.platformPie = true;
+  new Chart(document.getElementById('earningsPieChart').getContext('2d'), {
+    type:'doughnut',
+    data:{
+      labels:['Uber','Swiggy','Upwork'],
+      datasets:[{ data:[58,17,25],
+        backgroundColor:['#0096ff','#ff5f40','#00e5a0'], borderWidth:0 }]
+    },
+    options:{ ...chartDefaults, cutout:'60%' }
+  });
+}
+
+function initAnalyticsCharts() {
+  if (chartsInitialized.analytics) return;
+  chartsInitialized.analytics = true;
+  const days = Array.from({length:30},(_,i)=>{
+    const d=new Date(); d.setDate(d.getDate()-29+i);
+    return d.getDate()+'/'+(d.getMonth()+1);
+  });
+  new Chart(document.getElementById('dailyChart').getContext('2d'), {
+    type:'line',
+    data:{ labels:days, datasets:[{
+      label:'Daily Income (₹)',
+      data:days.map(()=>800+Math.random()*800),
+      borderColor:'#0096ff', backgroundColor:'rgba(0,150,255,0.08)',
+      fill:true, tension:0.4, pointRadius:0
+    }]},
+    options:{ ...chartDefaults,
+      scales:{
+        x:{...gridOpts,ticks:{...gridOpts.ticks,maxTicksLimit:8}},
+        y:{...gridOpts,ticks:{...gridOpts.ticks,callback:v=>'₹'+v}}
+      }}
+  });
+  new Chart(document.getElementById('triggerPieChart').getContext('2d'), {
+    type:'pie',
+    data:{ labels:['Platform','Weather','Income Drop','Demand'],
+      datasets:[{ data:[45,28,18,9],
+        backgroundColor:['#00e5a0','#0096ff','#f5c842','#ff5f40'],
+        borderWidth:0 }]},
+    options:{...chartDefaults}
+  });
+  new Chart(document.getElementById('platformChart').getContext('2d'), {
+    type:'bar',
+    data:{ labels:['Oct','Nov','Dec','Jan','Feb','Mar'], datasets:[
+      { label:'Uber', data:[12000,14000,9000,16000,13000,17000],
+        backgroundColor:'rgba(0,150,255,0.5)', borderRadius:4 },
+      { label:'Swiggy', data:[5000,6000,4000,7000,6500,8200],
+        backgroundColor:'rgba(255,95,64,0.5)', borderRadius:4 },
+      { label:'Upwork', data:[8000,9000,7000,10000,8500,12100],
+        backgroundColor:'rgba(0,229,160,0.5)', borderRadius:4 },
+    ]},
+    options:{ ...chartDefaults,
+      scales:{
+        x:{...gridOpts},
+        y:{...gridOpts,ticks:{...gridOpts.ticks,callback:v=>'₹'+(v/1000)+'k'}}
+      }}
+  });
+}
+
+function initRiskChart() {
+  if (chartsInitialized.risk) return;
+  chartsInitialized.risk = true;
+  new Chart(document.getElementById('riskHistoryChart').getContext('2d'), {
+    type:'line',
+    data:{ labels:['Oct','Nov','Dec','Jan','Feb','Mar'],
+      datasets:[{ label:'Risk Score', data:[72,78,65,82,80,87],
+        borderColor:'#00e5a0', backgroundColor:'rgba(0,229,160,0.08)',
+        fill:true, tension:0.4,
+        pointBackgroundColor:'#00e5a0', pointRadius:5 }]},
+    options:{ ...chartDefaults,
+      scales:{ x:{...gridOpts}, y:{min:0,max:100,...gridOpts} }}
+  });
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', () => {
+  renderPayouts();
+  renderTriggers();
+  renderPlatforms();
+  const loggedIn = checkAuth();
+  if (loggedIn) {
+    setTimeout(initOverviewCharts, 100);
+    setTimeout(() => showToast('⚡ Auto-payout of ₹2,100 triggered!'), 3000);
+  }
+});
+</script>
+</body>
+</html>
