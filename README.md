@@ -1,13 +1,13 @@
-# 🚀 GigShield – AI-Powered Parametric Insurance for Gig Workers
+#  GigShield – AI-Powered Parametric Insurance for Gig Workers
 
-## 📌 Overview
+##  Overview
 GigShield is an AI-driven parametric insurance platform designed to protect gig workers (like delivery partners and drivers) from income loss caused by external disruptions such as platform downtime or adverse weather conditions.
 
 The platform automates claim processing and simulates instant payouts, ensuring fast and reliable financial protection.
 
 ---
 
-## 🎯 Problem Statement
+##  Problem Statement
 Gig workers face unpredictable income due to:
 - Platform outages
 - Weather disruptions
@@ -17,36 +17,36 @@ GigShield solves this by providing automated, trigger-based insurance payouts.
 
 ---
 
-## 💡 Key Features
+##  Key Features
 
-### 🔐 Authentication System
+###  Authentication System
 - User Registration & Login
 - Secure password hashing using bcrypt
 - JWT-based authentication
 
-### 📊 User Dashboard
+###  User Dashboard
 - Risk Score Analysis
 - Earnings Protection Overview
 - Active Insurance Plan
 - Analytics & Insights
 
-### ⚡ Parametric Triggers
+###  Parametric Triggers
 - Platform Downtime Detection
 - Weather-based triggers
 - Automatic claim initiation
 
-### 💰 Instant Payout (Simulated)
+###  Instant Payout (Simulated)
 - Auto claim approval
 - Simulated instant payouts
 - Real-time status updates
 
-### 🧠 AI-Based Risk Scoring
+###  AI-Based Risk Scoring
 - Dynamic risk score calculation
 - Helps users understand financial risk level
 
 ---
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 ### Backend
 - Node.js
@@ -64,7 +64,7 @@ GigShield solves this by providing automated, trigger-based insurance payouts.
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 GigShield/
 │
@@ -85,7 +85,7 @@ GigShield/
 
 ---
 
-## ⚙️ Installation & Setup
+##  Installation & Setup
 
 ### 1. Clone the repository
 git clone https://github.com/your-username/your-repo-name.git
@@ -103,7 +103,7 @@ npm run dev
 
 ---
 
-## 🔐 Environment Variables
+##  Environment Variables
 
 Create a `.env` file in backend folder and add:
 
@@ -114,7 +114,7 @@ PORT=5000
 
 ---
 
-## 🧪 API Endpoints
+##  API Endpoints
 
 ### Auth Routes
 - POST /api/auth/register → Register user  
@@ -125,7 +125,7 @@ PORT=5000
 
 
 
-## 📊 Future Scope (Phase 3)
+##  Future Scope (Phase 3)
 - Advanced Fraud Detection (GPS spoofing, fake claims)
 - Real-time weather API integration
 - Instant payout via payment gateway (Razorpay/Stripe sandbox)
@@ -134,7 +134,7 @@ PORT=5000
 
 ---
 
-## 🏆 Hackathon Project
+##  Hackathon Project
 This project is developed as part of a hackathon to demonstrate:
 - AI-driven insurance automation
 - Parametric claim processing
@@ -142,19 +142,19 @@ This project is developed as part of a hackathon to demonstrate:
 
 ---
 
-## 👨‍💻 Team
+##  Team
 - Sweety (Team Leader) (Backend & Full Stack Developer)
 - Sonakshi Singh (Frontend Developer)
 - Rinku Kumar ( Backend Developer)
 
 ---
 
-## 📜 License
+## License
 This project is licensed under the MIT License.
 
 ---
 
-## 💙 Acknowledgements
+##  Acknowledgements
 Thanks to the hackathon organizers and mentors for guidance and support.
 
 ---
