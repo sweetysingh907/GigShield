@@ -1079,13 +1079,10 @@
 
   
 
-  fetch('https://gigshield-backend.onrender.com/api/health')
-  .then(() => console.log('Backend is awake!'))
-  .catch(() => console.log('Waking up backend...'));
+ 
  
 // ===== CONFIG =====
-const API_BASE = 'https://gigshield-backend-zk17.onrender.com/api';
-apiFetch('/auth/login')
+const API_BASE = 'https://gigshield-production.up.railway.app'
 
 function getToken() {
   return localStorage.getItem('gigshield_token');
